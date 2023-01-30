@@ -1,0 +1,36 @@
+- name: Install Jenkins
+  hosts: jenkins_server
+  become: yes
+
+  tasks:
+    - name: Add Jenkins repository
+      apt_repository:
+        repo: "deb https://pkg.jenkins.io/debian-stable binary/"
+        state: present
+        filename: "jenkins.io.deb"
+
+    - name: Install required packages
+      apt:
+        name:
+          - openjdk-8-jre-headless
+          - apt-transport-https
+          - ca-certificates
+          - gnupg2
+          - software-properties-common
+        update_cache: yes
+
+    - name: Import Jenkins GPG Key
+      apt_key:
+        url: https://pkg.jenkins.io/debian/jenkins.io.key
+        state: present
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: latest
+        update_cache: yes
+
+    - name: Start Jenkins Service
+      service:
+        name: jenkins
+        state: started
